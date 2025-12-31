@@ -4,14 +4,18 @@
     <div class="px-5 subheader-bg border-b border-gray-300 flex justify-between">
       <p class="grow border-r border-gray-300 py-3">已選取 {{ selectedItems.length }} 個電表</p>
       <div class="flex items-center pl-3">
-        <p class="flex items-center mr-6 cursor-pointer">
+        <button type="button" class="flex items-center mr-6 cursor-pointer">
           <img class="mr-2 h-4 w-4 mb-1"
             src="../src/assets/image/border_color_20dp_2854C5_FILL0_wght400_GRAD0_opsz20.png" alt="">編輯電表
-        </p>
-        <p class="flex items-center cursor-pointer">
-          <img class="mr-1 h-5 w-5 d-block"
-            src="../src/assets/image/tab_move_20dp_2854C5_FILL0_wght400_GRAD0_opsz20.png" alt="">移動階層
-        </p>
+        </button>
+        <button type="button" class="flex items-center" @click="openDialog" :class="{
+          'cursor-pointer': selectedItems.length > 0,
+          'text-gray-400': selectedItems.length === 0
+        }" :disabled="selectedItems.length === 0">
+          <img class="mr-1 h-5 w-5 d-block "
+            src="../src/assets/image/tab_move_20dp_2854C5_FILL0_wght400_GRAD0_opsz20.png" alt="">
+          <span class="leading-tight">移動階層</span>
+        </button>
       </div>
     </div>
     <div class="flex grow overflow-x-auto">
@@ -20,7 +24,8 @@
         <p class="py-3 px-5 header-bg border-b border-gray-300">第 0 層</p>
         <ul class="p-1 grow">
           <li v-for="node in meterHierarchyTree" :key="node.id">
-            <div class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-300 cursor-pointer"
+            <div
+              class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-300 cursor-pointer select-none"
               :class="{ 'bg-blue-50 text-blue-600': isSelected(node.id) }" @click="handleNodeClick(node, 0, $event)">
               <p class="">{{ node.name }}</p>
               <img v-if="node.children?.length"
@@ -36,7 +41,7 @@
           <p class="py-3 px-5 header-bg border-b border-gray-300">第 {{ level }} 層</p>
           <ul class="p-1 grow">
             <li v-for="node in selectedNodes[level - 1].children || []"
-              class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-300 cursor-pointer"
+              class="flex items-center justify-between px-4 py-3 rounded hover:bg-gray-300 cursor-pointer select-none"
               :class="{ 'bg-blue-50 text-blue-600': isSelected(node.id) }"
               @click="handleNodeClick(node, level, $event)">
               <p>{{ node.name }}</p>
@@ -49,18 +54,14 @@
     </div>
 
 
-    <MoveHierarchyModal :visible="visible" :meterFlatList="meterFlatList" :metersToMove="selectedItems"
+    <MoveHierarchyModal :visible="visible" :meterFlatList="meterFlatList" :metersToMove="metersToMove"
       @cancel="visible = false">
     </MoveHierarchyModal>
-
-    <el-button plain @click="openDialog">
-      Click to open the Dialog
-    </el-button>
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import axios from 'axios'
 import MoveHierarchyModal from '@/components/MoveHierarchyModal.vue'
 
@@ -76,9 +77,10 @@ const selectedNodes = ref({})
 const currentMaxLevel = ref(1)
 // 存儲所有選中的節點
 const selectedItems = ref([]);
+const metersToMove = ref([])
 
 
-const visible = ref(true)
+const visible = ref(false)
 
 axios.get('http://localhost:3001/nodes?flat=false').then((res) => {
   if (!res.data.length) {
@@ -101,7 +103,7 @@ axios.get('http://localhost:3001/nodes?flat=false').then((res) => {
 
 // 處理點擊節點
 const handleNodeClick = (node, level, event) => {
-  console.log(node, level)
+
   // 設置當前層級的選中節點
   selectedNodes.value[level] = node;
 
@@ -164,9 +166,12 @@ const isSelected = (id) => {
 };
 
 
-const openDialog = () => {
+const openDialog = async () => {
   visible.value = true
   meterFlatList.value = flattenTreeForSelect(meterHierarchyTree.value)
+  metersToMove.value = []
+  await nextTick()
+  metersToMove.value = selectedItems.value
 }
 
 
@@ -178,26 +183,33 @@ const openDialog = () => {
 
 
 // 將樹狀資料扁平化為列表
-const flattenTreeForSelect = (nodes, parent_id = null, result = []) => {
+const flattenTreeForSelect = (nodes, parent_id = null, parentPath = '', result = []) => {
 
   if (!nodes) return result
 
   for (const node of nodes) {
+
+    // 構建當前節點的路徑
+    const currentPath = parentPath ? `${parentPath}/${node.id}` : `/${node.id}`;
+
     const option = {
       id: node.id,
       value: node.id,
       name: node.name,
       depth: node.depth,
       parent_id: parent_id,
+      path: currentPath  // 添加路徑信息
     };
 
     result.push(option);
 
     // 遞歸處理子節點
     if (node.children && node.children.length > 0) {
-      flattenTreeForSelect(node.children, node.id, result);
+      flattenTreeForSelect(node.children, node.id, currentPath, result);
     }
   }
+
+  console.log(result)
 
   return result;
 };
