@@ -33,9 +33,10 @@
 import { ref, watch } from 'vue'
 import axios from 'axios'
 import { ElMessageBox } from 'element-plus'
+import infoStore from '@/stores/infoStore.js'
 
 // 定義 emits
-const emit = defineEmits(['update:visible', 'update:targetParentId', 'confirm', 'cancel']);
+const emit = defineEmits(['confirm', 'cancel']);
 
 // 定義 props
 const props = defineProps({
@@ -58,12 +59,8 @@ const dialogVisible = ref(props.visible); // 是否顯示對話框
 const options = ref(props.meterFlatList); //父電表選項列表
 const localMetersToMove = ref([]); // 欲移動的設備 (副本，刪減不影響 props)
 const targetMeter = ref(null) // 選定的父電表
-const errorMessageBoxSetting = {
-    confirmButtonText: '確認',
-    showCancelButton: false,
-    type: 'error',
-    confirmButtonClass: '!bg-red-500 !border !border-red-500'
-}
+const useInfoStore = infoStore()
+const { errorMessageBoxSetting } = useInfoStore
 
 watch(() => props.visible, (newValue) => {
     dialogVisible.value = newValue;
@@ -129,7 +126,7 @@ async function metersMoveAction(action) {
             const payload = { target_parent_id, node_ids }
 
             await axios.patch('http://localhost:3001/nodes/move', payload)
-            emit('confirm', localMetersToMove)
+            emit('confirm', localMetersToMove.value, true)
         } else {
             emit('cancel')
         }
