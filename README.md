@@ -28,7 +28,7 @@ e.g.  ➜  Local:   http://localhost:5173/
 ```
 
 ## 專案資料夾結構
-
+```
 blutech-project/
 ├── public/
 │   └── favicon.ico
@@ -50,9 +50,10 @@ blutech-project/
 ├── package.json                    # 專案依賴與腳本
 ├── vite.config.js                  # Vite 設定檔
 └── README.md                       # 專案說明文件
-
+```
 
 ## 功能對應 / 套件
+```
 框架 : Vue.js (v3.5.26)
 電表階層顯示與管理樣式：Tailwind 
 拖曳功能：Vue Draggable Plus
@@ -60,3 +61,4 @@ API：Axios
 狀態管理：Pinia
 UI 元件與提示元件：Element Plus
 路由：Vue Router
+```
