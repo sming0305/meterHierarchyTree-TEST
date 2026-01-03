@@ -35,10 +35,8 @@ import axios from 'axios'
 import { ElMessageBox } from 'element-plus'
 import infoStore from '@/stores/infoStore.js'
 
-// 定義 emits
 const emit = defineEmits(['confirm', 'cancel']);
 
-// 定義 props
 const props = defineProps({
     visible: {
         type: Boolean,
@@ -82,7 +80,6 @@ watch(() => props.metersToMove, (newValue) => {
     deep: true
 })
 
-// 確認一下兩者差異 fun
 const removeMeter = (index) => {
     if (localMetersToMove.value.length === 1) {
         ElMessageBox.confirm('若要移動階層請至少保留一個設備。', '錯誤', errorMessageBoxSetting)
@@ -114,6 +111,7 @@ function validateSelection(value) {
     }
 }
 
+//  執行設備移動或關閉視窗
 async function metersMoveAction(action) {
     try {
         if (action) {

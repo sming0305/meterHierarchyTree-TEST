@@ -6,14 +6,14 @@
       <div class="flex items-center pl-3">
         <button type="button" class="flex items-center mr-6 cursor-pointer">
           <img class="mr-2 h-4 w-4 mb-1" src="@/assets/image/border_color_20dp_2854C5_FILL0_wght400_GRAD0_opsz20.png"
-            alt="">編輯電表
+            alt="edit_icon">編輯電表
         </button>
         <button type="button" class="flex items-center" @click="openDialog" :class="{
           'cursor-pointer': selectedItems.length > 0,
           'text-gray-400': selectedItems.length === 0
         }" :disabled="selectedItems.length === 0">
           <img class="mr-1 h-5 w-5 d-block " src="@/assets/image/tab_move_20dp_2854C5_FILL0_wght400_GRAD0_opsz20.png"
-            alt="">
+            alt="move_icon">
           <span class="leading-tight">移動階層</span>
         </button>
       </div>
@@ -33,11 +33,11 @@
             }" @click="handleNodeClick(node, 0, $event)" :data-node-id="node.id">
             <p flex="shrink-0">{{ node.name }}</p>
             <img v-if="node.children?.length"
-              src="@/assets/image/keyboard_arrow_right_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="">
+              src="@/assets/image/keyboard_arrow_right_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="arrow_right_icon">
             <!-- 下層容器 -->
             <VueDraggable v-model="node.children" group="meters" class="drop-zone border border-dashed border-gray-400
             flex justify-center items-center" v-if="draggableInitialized" :data-id="node.id" :data-container="true">
-              <img src="@/assets/image/move_group_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt=""
+              <img src="@/assets/image/move_group_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="move_group_icon"
                 style="width: 18px; height: 18px;">
             </VueDraggable>
           </div>
@@ -48,7 +48,7 @@
         <div v-if="selectedNodes[level - 1] && selectedNodes[level - 1].children.length > 0"
           class="w-[300px] m-[-1px] border border-gray-300 flex flex-col">
           <p class="py-3 px-5 header-bg border-b border-gray-300">第 {{ level }} 層</p>
-          <VueDraggable group="meters" v-model="selectedNodes[level - 1].children" class="p-1  grow" @move="checkMove"
+          <VueDraggable group="meters" v-model="selectedNodes[level - 1].children" class="p-1 grow" @move="checkMove"
             @end="onDragEnd" @start="onDragStart" v-if="draggableInitialized" :data-level="`${level}`"
             :data-id="selectedNodes[level - 1].id">
             <div v-for="node in selectedNodes[level - 1].children || []"
@@ -60,12 +60,12 @@
               }" @click="handleNodeClick(node, level, $event)" :data-node-id="node.id">
               <p class="shrink-0">{{ node.name }}</p>
               <img v-if="node.children?.length"
-                src="@/assets/image/keyboard_arrow_right_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="">
+                src="@/assets/image/keyboard_arrow_right_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="arrow_right_icon">
               <!-- 下層容器 -->
               <VueDraggable v-model="node.children" group="meters"
                 class="drop-zone border border-dashed border-gray-400 flex justify-center items-center"
                 v-if="draggableInitialized" :data-id="node.id" :data-container="true">
-                <img src="@/assets/image/move_group_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt=""
+                <img src="@/assets/image/move_group_24dp_666666_FILL0_wght400_GRAD0_opsz24.svg" alt="move_group_icon"
                   style="width: 18px; height: 18px;">
               </VueDraggable>
             </div>
@@ -106,7 +106,7 @@ const meterFlatList = ref([])
 const selectedNodes = ref({})
 // 目前需要渲染的最大層數
 const currentMaxLevel = ref(1)
-// 存儲所有選中的節點
+// 儲存所有選中的節點
 const selectedItems = ref([]);
 // 欲移動的裝置
 const metersToMove = ref([])
@@ -114,7 +114,7 @@ const metersToMove = ref([])
 // 移動階層 modal 顯示
 const visible = ref(false)
 
-// 標記拖曳功能是否已初始化
+// 拖曳功能是否已初始化
 const draggableInitialized = ref(false);
 
 const useInfoStore = infoStore()
@@ -221,7 +221,7 @@ const onDragEnd = async (evt) => {
 
   } catch (error) {
     console.error('拖曳處理錯誤', error);
-    ElMessageBox.confirm(`${error.response?.data?.error || '移動失敗'}，請重新嘗試。`, '拖曳移動失敗', errorMessageBoxSetting);
+    ElMessageBox.confirm(`${error.response?.data?.error || '移動失敗'}，請重新整理頁面進行嘗試。`, '拖曳移動失敗', errorMessageBoxSetting);
   }
 };
 
@@ -279,6 +279,7 @@ async function refreshData(finalMetersToMove) {
 
   ElMessageBox.confirm(`電表階層更新完成。`, '更新成功', successMessageBoxSetting);
 }
+
 
 // 將樹狀資料扁平化為列表
 const flattenTreeForSelect = (nodes, parent_id = null, parentPath = '', result = []) => {
